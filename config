@@ -1,0 +1,9 @@
+const firebaseConfig = {
+            apiKey: "AIzaSyDcmGVvssv7R6bF8_XQ-yhz6-J2X400qX8",
+            authDomain: "shipmnts-994de.firebaseapp.com",
+            databaseURL: "https://shipmnts-994de-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "shipmnts-994de",
+            storageBucket: "shipmnts-994de.appspot.com",
+            messagingSenderId: "551452146305",
+            appId: "1:551452146305:web:c9d9197f78e32c715ceb80"
+        };
