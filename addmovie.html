@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Genre - IMDB</title>
+    <title>Add Movie - IMDB</title>
     <link rel="icon" type="image/png" href="assets/img/images/icon.png" />
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
+
 <link rel="stylesheet" media="screen" href="assets/css/style.css">
 <style>
   header {
@@ -73,19 +74,22 @@
     <div class="card shadow-lg o-hidden border-0 my-5">
         <div class="card-body p-0">
             <div class="row">
+                <div class="col-lg-5 d-none d-lg-flex"><img class="d-xl-flex justify-content-center align-items-center align-content-center align-self-center mx-auto justify-content-xl-center align-items-xl-center" src="assets/img/images/logo-dark.png" style="width: 367px;height: 367px;"></div>
                 <div class="col-lg-7">
                     <div class="p-5">
                         <div class="text-center">
-                            <h4 class="text-dark mb-4">Genre</h4>
-                            <a href="addgenre.html">
-                              <button>Add genre</button>
-                           </a>
-                      
-                        
+                            <h4 class="text-dark mb-4">Add Movie</h4>
                         </div>
                                 <div class="form-group">
-                                    </div>
-                                <div id="genreButtons"></div>
+                                    <input class="form-control form-control-user" type="text" id="moviename" aria-describedby="" placeholder="Movie Name" name="moviename" style="margin-top: 17px;" required>
+                                    <input class="form-control form-control-user" type="text" id="description" aria-describedby="" placeholder="description" name="description" style="margin-top: 17px;" required><br>
+                                    Genre:
+                                    <select class="form-control form-control-user" placeholder="genre" id="genre">
+                                    </select>
+                                    <input class="form-control form-control-user" type="date" id="releasedate" aria-describedby="" placeholder="release date" name="release date" style="margin-top: 17px;" required>
+                                </div>
+                                <button class="btn btn-primary btn-block text-white btn-user" type="submit" onclick="addmovie()">Add Movie</button>
+                        
                                 <hr>
                         <div class="text-center"></div>
                         
@@ -101,11 +105,9 @@
       <!-- scripts -->
       <script src="assets/js/particles.js"></script>
       <script src="assets/js/app.js"></script>
+    
   <script>
     // Initialize Firebase
-    function redirect() {
-      window.location.href = "addgenre.html";
-  }
     const firebaseConfig = {
         apiKey: "AIzaSyDcmGVvssv7R6bF8_XQ-yhz6-J2X400qX8",
         authDomain: "shipmnts-994de.firebaseapp.com",
@@ -117,49 +119,45 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-
-    var genreButtonsDiv = document.getElementById('genreButtons');
+    var selectElement = document.getElementById('genre');
     
-    // Fetch genre names and create buttons for each genre
-    function fetchAndCreateGenreButtons() {
-      var genreRef = firebase.database().ref('genre');
-  
-      genreRef.on('value', function(snapshot) {
-        // Clear existing buttons
-        genreButtonsDiv.innerHTML = '';
-  
-        // Loop through the genre names and add buttons for each genre
-        snapshot.forEach(function(childSnapshot) {
-          var genreName = childSnapshot.key;
-          
-          // Create a button for the genre
-          var button = document.createElement('button');
-          button.className = 'btn btn-primary btn-block text-white btn-user';
-          button.textContent = genreName;
-          
-          // Set up the onclick function for the button
-          button.onclick = function() {
-            localStorage.setItem('genre', genreName);
-            window.location.href = 'movie.html';
-          };
-
-          // Append the button to the div
-          genreButtonsDiv.appendChild(button);
+      // Fetch genre names from the Firebase Realtime Database
+      function fetchGenreNames() {
+        var genreRef = firebase.database().ref('genre');
+    
+        genreRef.on('value', function(snapshot) {
+          // Clear existing options
+          selectElement.innerHTML = '';
+    
+          // Loop through the genre names and add them to the <select> element
+          snapshot.forEach(function(childSnapshot) {
+            var option = document.createElement('option');
+            option.value = childSnapshot.key; // Use the genre name as the value
+            option.textContent = childSnapshot.key; // Use the genre name as the display text
+            selectElement.appendChild(option);
+          });
         });
-      });
-    }
-    fetchAndCreateGenreButtons();
+      }
+    
+      // Call the function to fetch genre names
+      fetchGenreNames();
 
-    function genre() {
+    function addmovie() {
         // Get the form data
+        var movieName = document.getElementById("moviename").value;
+        var description = document.getElementById("description").value;
         var genre = document.getElementById("genre").value;
+        var releasedate = document.getElementById("releasedate").value;
         
         // Save the data to Firebase Realtime Database
-        firebase.database().ref('genre/'+ genre + "/null").set({
-        1: "null",
+        firebase.database().ref('genre/'+ genre +"/"+movieName).set({
+        movieName: movieName,
+        description: description,
+        releasedate: releasedate
           
         }).then(function() {
           console.log("Data saved successfully.");
+          alert("Movie added successfully");
         }).catch(function(error) {
           console.error("Error saving data: ", error);
         });

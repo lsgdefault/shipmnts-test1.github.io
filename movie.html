@@ -14,7 +14,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
-
 <link rel="stylesheet" media="screen" href="assets/css/style.css">
 <style>
   header {
@@ -74,22 +73,19 @@
     <div class="card shadow-lg o-hidden border-0 my-5">
         <div class="card-body p-0">
             <div class="row">
-                <div class="col-lg-5 d-none d-lg-flex"><img class="d-xl-flex justify-content-center align-items-center align-content-center align-self-center mx-auto justify-content-xl-center align-items-xl-center" src="assets/img/images/logo-dark.png" style="width: 367px;height: 367px;"></div>
                 <div class="col-lg-7">
                     <div class="p-5">
                         <div class="text-center">
-                            <h4 class="text-dark mb-4">Add Movie</h4>
+                            <h4 class="text-dark mb-4">Movie</h4>
+                        
+                            <a href="addmovie.html">
+                              <button>Add Movie</button>
+                           </a>
+                        
                         </div>
                                 <div class="form-group">
-                                    <input class="form-control form-control-user" type="text" id="moviename" aria-describedby="" placeholder="Movie Name" name="moviename" style="margin-top: 17px;" required>
-                                    <input class="form-control form-control-user" type="text" id="description" aria-describedby="" placeholder="description" name="description" style="margin-top: 17px;" required><br>
-                                    Genre:
-                                    <select class="form-control form-control-user" placeholder="genre" id="genre">
-                                    </select>
-                                    <input class="form-control form-control-user" type="date" id="releasedate" aria-describedby="" placeholder="release date" name="release date" style="margin-top: 17px;" required>
-                                </div>
-                                <button class="btn btn-primary btn-block text-white btn-user" type="submit" onclick="addmovie()">Add Movie</button>
-                        
+                                    </div>
+                                <div id="movieButtons"></div>
                                 <hr>
                         <div class="text-center"></div>
                         
@@ -105,9 +101,9 @@
       <!-- scripts -->
       <script src="assets/js/particles.js"></script>
       <script src="assets/js/app.js"></script>
-    
   <script>
     // Initialize Firebase
+    
     const firebaseConfig = {
         apiKey: "AIzaSyDcmGVvssv7R6bF8_XQ-yhz6-J2X400qX8",
         authDomain: "shipmnts-994de.firebaseapp.com",
@@ -119,48 +115,39 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    var selectElement = document.getElementById('genre');
-    
-      // Fetch genre names from the Firebase Realtime Database
-      function fetchGenreNames() {
-        var genreRef = firebase.database().ref('genre');
-    
-        genreRef.on('value', function(snapshot) {
-          // Clear existing options
-          selectElement.innerHTML = '';
-    
-          // Loop through the genre names and add them to the <select> element
-          snapshot.forEach(function(childSnapshot) {
-            var option = document.createElement('option');
-            option.value = childSnapshot.key; // Use the genre name as the value
-            option.textContent = childSnapshot.key; // Use the genre name as the display text
-            selectElement.appendChild(option);
-          });
-        });
-      }
-    
-      // Call the function to fetch genre names
-      fetchGenreNames();
+    var retrievedGenre = localStorage.getItem('genre');
+    console.log(retrievedGenre);
 
-    function addmovie() {
-        // Get the form data
-        var movieName = document.getElementById("moviename").value;
-        var description = document.getElementById("description").value;
-        var genre = document.getElementById("genre").value;
-        var releasedate = document.getElementById("releasedate").value;
-        
-        // Save the data to Firebase Realtime Database
-        firebase.database().ref('genre/'+ genre + movieName).set({
-        movieName: movieName,
-        description: description,
-        releasedate: releasedate
-          
-        }).then(function() {
-          console.log("Data saved successfully.");
-        }).catch(function(error) {
-          console.error("Error saving data: ", error);
-        });
-      }
+    var genreButtonsDiv = document.getElementById('movieButtons');
+
+    function fetchAndCreateGenreButtons() {
+          var genreRef = firebase.database().ref('genre/' + retrievedGenre + '/');
+      
+          genreRef.on('value', function(snapshot) {
+    
+            genreButtonsDiv.innerHTML = '';
+      
+            snapshot.forEach(function(childSnapshot) {
+              var moviename = childSnapshot.key;
+      
+              if (moviename !== "null") {
+                var button = document.createElement('button');
+                button.className = 'btn btn-primary btn-block text-white btn-user';
+                button.textContent = moviename;
+      
+                button.onclick = function() {
+                  localStorage.setItem('moviename', moviename);
+                  window.location.href = 'updatemovie.html';
+                };
+      
+                genreButtonsDiv.appendChild(button);
+              }
+            });
+          });
+        }
+
+        fetchAndCreateGenreButtons();
+    
 
         var database = firebase.database();
 
